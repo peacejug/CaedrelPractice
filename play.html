@@ -16,7 +16,6 @@ body {
   overflow: hidden;
 }
 
-/* Background video */
 #bgVideo, #bgMobileVideo {
   position: fixed;
   top: 0;
@@ -25,10 +24,9 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: -2;
-  pointer-events: none; /* Prevent taps from interacting */
+  pointer-events: none;
 }
 
-/* Dark overlay */
 body::before {
   content: "";
   position: fixed;
@@ -85,7 +83,6 @@ button {
   margin: 10px 0;
 }
 
-/* Win overlay */
 #winOverlay {
   display: none;
   position: fixed;
@@ -133,22 +130,9 @@ button {
   color: white;
 }
 
-@keyframes flash {
-  from {background: rgba(0,0,0,0.7);}
-  to {background: rgba(255,255,0,0.3);}
-}
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-@keyframes shake {
-  0% { transform: translate(0,0); }
-  25% { transform: translate(-5px,0); }
-  50% { transform: translate(5px,0); }
-  75% { transform: translate(-5px,0); }
-  100% { transform: translate(0,0); }
-}
+@keyframes flash { from {background: rgba(0,0,0,0.7);} to {background: rgba(255,255,0,0.3);} }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes shake { 0% { transform: translate(0,0); } 25% { transform: translate(-5px,0); } 50% { transform: translate(5px,0); } 75% { transform: translate(-5px,0); } 100% { transform: translate(0,0); } }
 </style>
 </head>
 <body>
@@ -186,7 +170,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const mobileVideo = document.createElement('video');
     mobileVideo.id = 'bgMobileVideo';
-    mobileVideo.src = 'https://i.imgur.com/6XtFFpe.mp4'; // replace with small MP4 for mobile
+    mobileVideo.src = 'https://i.imgur.com/6XtFFpe.mp4';
     mobileVideo.autoplay = true;
     mobileVideo.muted = true;
     mobileVideo.loop = true;
@@ -209,7 +193,7 @@ let gameOver = false;
 let gameLoop;
 let cancelButton = document.getElementById("cancelButton");
 let restartButton = document.getElementById("restartButton");
-let animationLock = false; // prevent spam
+let animationLock = false;
 
 function updateBar() {
   let percent = (currentHP / maxHP) * 100;
@@ -217,11 +201,21 @@ function updateBar() {
   document.getElementById("hpText").innerText = "Ezreal HP: " + Math.max(0, Math.floor(currentHP));
 }
 
+function playCancelSound() {
+  const audio = new Audio('https://peacejug.github.io/CaedrelPractice/cancel.mp3');
+  audio.volume = 0.5;
+  audio.play();
+}
+
 function endGame(message, isWin=false) {
   if(animationLock) return;
   animationLock = true;
   gameOver = true;
+
   if(isWin){
+    const winSound = new Audio('https://peacejug.github.io/CaedrelPractice/win.mp3');
+    winSound.volume = 0.7;
+    winSound.play();
     document.getElementById("winOverlay").style.display = "flex";
   } else {
     document.getElementById("result").innerText = message + " | press F/tap to try again";
@@ -231,6 +225,7 @@ function endGame(message, isWin=false) {
 
 function cancelUlt(){
   if(gameOver) return;
+  playCancelSound();
   if(Math.floor(currentHP)===834){
     endGame("Welcome Back, Master Caedrel", true);
   } else if(currentHP<834 && currentHP>0){
@@ -258,13 +253,18 @@ function startGame(){
 }
 
 // Controls
-cancelButton.addEventListener('click', cancelUlt);
+cancelButton.addEventListener('click', () => {
+  if(gameOver){
+    startGame(); // restart on PC click if game over
+  } else {
+    cancelUlt();
+  }
+});
 restartButton.addEventListener('click', startGame);
 
 document.body.addEventListener('touchstart', function(e){
   if(gameOver){ startGame(); } else { cancelUlt(); }
 });
-
 document.addEventListener("keydown", function(e){
   if(e.code==="Space") cancelUlt();
   if(e.code==="KeyF" && gameOver) startGame();
