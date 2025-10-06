@@ -16,8 +16,8 @@ body {
   overflow: hidden;
 }
 
-/* Background video */
-#bgVideo {
+/* Background video/GIF */
+#bgVideo, #bgGIF {
   position: fixed;
   top: 0;
   left: 0;
@@ -25,7 +25,7 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: -2;
-  pointer-events: none; /* Prevent taps from opening video */
+  pointer-events: none; /* Prevent taps */
 }
 
 /* Dark overlay */
@@ -174,11 +174,34 @@ button {
 </div>
 
 <script>
+function isMobile() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if(isMobile()){
+    const video = document.getElementById('bgVideo');
+    video.parentNode.removeChild(video);
+
+    const img = document.createElement('img');
+    img.src = 'https://i.imgur.com/JHtd2p2.gif';
+    img.id = 'bgGIF';
+    img.style.position = 'fixed';
+    img.style.top = '0';
+    img.style.left = '0';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.style.zIndex = '-2';
+    img.style.pointerEvents = 'none';
+    document.body.appendChild(img);
+  }
+});
+
 let maxHP = 834;
 let currentHP = maxHP;
 let gameOver = false;
 let gameLoop;
-let bgVideo = document.getElementById("bgVideo");
 let cancelButton = document.getElementById("cancelButton");
 let restartButton = document.getElementById("restartButton");
 
@@ -213,8 +236,8 @@ function startGame(){
   document.getElementById("result").innerText = "";
   document.getElementById("winOverlay").style.display = "none";
   updateBar();
-  bgVideo.currentTime = 0;
-  bgVideo.play();
+  const bgVideo = document.getElementById('bgVideo');
+  if(bgVideo){ bgVideo.currentTime = 0; bgVideo.play(); }
   gameLoop = setInterval(()=>{
     if(gameOver){ clearInterval(gameLoop); return;}
     currentHP -= 20;
@@ -230,13 +253,8 @@ cancelButton.addEventListener('click', cancelUlt);
 restartButton.addEventListener('click', startGame);
 
 document.body.addEventListener('touchstart', function(e){
-  if(gameOver){
-    startGame();
-  } else {
-    cancelUlt();
-  }
+  if(gameOver){ startGame(); } else { cancelUlt(); }
 });
-
 document.addEventListener("keydown", function(e){
   if(e.code==="Space") cancelUlt();
   if(e.code==="KeyF" && gameOver) startGame();
