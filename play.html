@@ -1,233 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caedrel Practice</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      color: white;
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caedrel Practice</title>
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: white;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
 
-    /* Background video */
-    #bgVideo {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      min-width: 100%;
-      min-height: 100%;
-      object-fit: cover;
-      z-index: -2;
-      pointer-events: none; /* Make video unclickable */
-    }
+/* Background video wrapper */
+#videoWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -100; /* Very far back to avoid taps */
+  overflow: hidden;
+}
+#bgVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-    /* Dark overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: -1;
-    }
+/* Dark overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: -1;
+}
 
-    #container {
-      position: relative;
-      z-index: 1;
-      padding-top: 50px;
-    }
+#container {
+  position: relative;
+  z-index: 1;
+  padding-top: 50px;
+}
 
-    #hpBar {
-      width: 90%;
-      max-width: 500px;
-      height: 30px;
-      background: rgba(0, 0, 0, 0.5);
-      margin: 20px auto;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    #hpFill {
-      height: 100%;
-      background: red;
-      width: 100%;
-      border-radius: 10px;
-    }
+#hpBar {
+  width: 90%;
+  max-width: 500px;
+  height: 30px;
+  background: rgba(0,0,0,0.5);
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#hpFill {
+  height: 100%;
+  background: red;
+  width: 100%;
+  border-radius: 10px;
+}
 
-    button {
-      padding: 25px 40px;
-      font-size: 24px;
-      margin-top: 20px;
-      cursor: pointer;
-      border: none;
-      border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
-      color: #333;
-    }
+button {
+  padding: 25px 40px;
+  font-size: 24px;
+  margin-top: 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  background-color: rgba(255,255,255,0.8);
+  color: #333;
+}
 
-    #result {
-      font-size: 28px;
-      margin-top: 20px;
-      font-weight: bold;
-      color: yellow;
-    }
+#result {
+  font-size: 28px;
+  margin-top: 20px;
+  font-weight: bold;
+  color: yellow;
+}
 
-    #hpText {
-      font-size: 20px;
-      margin: 10px 0;
-    }
+#hpText {
+  font-size: 20px;
+  margin: 10px 0;
+}
 
-    /* Flashy win screen */
-    #winOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      animation: flash 1s infinite alternate;
-    }
+/* Flashy win screen */
+#winOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  animation: flash 1s infinite alternate;
+}
 
-    #winOverlay img {
-      max-width: 400px;
-      border-radius: 20px;
-      box-shadow: 0 0 40px yellow;
-      animation: pulse 1s infinite;
-    }
+#winOverlay img {
+  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 0 40px yellow;
+  animation: pulse 1s infinite;
+}
 
-    #winOverlay h1 {
-      font-size: 40px;
-      color: yellow;
-      text-shadow: 0 0 20px red, 0 0 40px orange;
-      animation: shake 0.3s infinite;
-    }
+#winOverlay h1 {
+  font-size: 40px;
+  color: yellow;
+  text-shadow: 0 0 20px red, 0 0 40px orange;
+  animation: shake 0.3s infinite;
+}
 
-    @keyframes flash {
-      from { background: rgba(0,0,0,0.7); }
-      to { background: rgba(255,255,0,0.3); }
-    }
+/* Separate restart text */
+#restartText {
+  margin-top: 20px;
+  font-size: 22px;
+  color: white;
+}
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes shake {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(-5px, 0); }
-      50% { transform: translate(5px, 0); }
-      75% { transform: translate(-5px, 0); }
-      100% { transform: translate(0, 0); }
-    }
-  </style>
+@keyframes flash {
+  from {background: rgba(0,0,0,0.7);}
+  to {background: rgba(255,255,0,0.3);}
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-5px,0); }
+  50% { transform: translate(5px,0); }
+  75% { transform: translate(-5px,0); }
+  100% { transform: translate(0,0); }
+}
+</style>
 </head>
 <body>
-  <!-- Background video -->
-  <video autoplay muted id="bgVideo">
+
+<!-- Video wrapper -->
+<div id="videoWrapper">
+  <video autoplay muted loop id="bgVideo">
     <source src="https://i.imgur.com/6XtFFpe.mp4" type="video/mp4">
   </video>
+</div>
 
-  <div id="container">
-    <h1>Caedrel Practice</h1>
-    <p>Tap the button below or anywhere on the screen to cancel Malzahar's ult!</p>
-    <div id="hpBar"><div id="hpFill"></div></div>
-    <p id="hpText">Ezreal HP: 834</p>
-    <button id="cancelButton">Cancel Ult!</button>
-    <div id="result"></div>
-  </div>
+<div id="container">
+  <h1>Caedrel Practice</h1>
+  <p>Tap the button below or anywhere on the screen to cancel Malzahar's ult!</p>
+  <div id="hpBar"><div id="hpFill"></div></div>
+  <p id="hpText">Ezreal HP: 834</p>
+  <button id="cancelButton">Cancel Ult!</button>
+  <div id="result"></div>
+</div>
 
-  <!-- Win overlay -->
-  <div id="winOverlay">
-    <h1>WELCOME BACK, MASTER CAEDREL</h1>
-    <img src="https://i.imgur.com/Dbhe4vG.jpeg" alt="Caedrel Face" />
-    <p style="color:white; font-size:22px;">press F/tap to try again</p>
-  </div>
+<!-- Win overlay -->
+<div id="winOverlay">
+  <h1>WELCOME BACK, MASTER CAEDREL</h1>
+  <img src="https://i.imgur.com/Dbhe4vG.jpeg" alt="Caedrel Face" />
+  <p id="restartText">press F/tap to try again</p>
+</div>
 
-  <script>
-    let maxHP = 834;
-    let currentHP = maxHP;
-    let gameOver = false;
-    let gameLoop;
-    let bgVideo = document.getElementById("bgVideo");
-    let cancelButton = document.getElementById("cancelButton");
+<script>
+let maxHP = 834;
+let currentHP = maxHP;
+let gameOver = false;
+let gameLoop;
+let bgVideo = document.getElementById("bgVideo");
+let cancelButton = document.getElementById("cancelButton");
 
-    function updateBar() {
-      let percent = (currentHP / maxHP) * 100;
-      document.getElementById("hpFill").style.width = percent + "%";
-      document.getElementById("hpText").innerText = "Ezreal HP: " + Math.max(0, Math.floor(currentHP));
+function updateBar() {
+  let percent = (currentHP / maxHP) * 100;
+  document.getElementById("hpFill").style.width = percent + "%";
+  document.getElementById("hpText").innerText = "Ezreal HP: " + Math.max(0, Math.floor(currentHP));
+}
+
+function endGame(message, isWin=false) {
+  gameOver = true;
+  if(isWin){
+    document.getElementById("winOverlay").style.display = "flex";
+  } else {
+    document.getElementById("result").innerText = message + " | press F/tap to try again";
+  }
+  clearInterval(gameLoop);
+}
+
+function cancelUlt(){
+  if(gameOver) return;
+  if(Math.floor(currentHP)===834){
+    endGame("Welcome Back, Master Caedrel", true);
+  } else if(currentHP<834 && currentHP>0){
+    endGame("YOU ARE NOT CAEDREL, TRAIN MORE");
+  }
+}
+
+function startGame(){
+  currentHP = maxHP;
+  gameOver = false;
+  document.getElementById("result").innerText = "";
+  document.getElementById("winOverlay").style.display = "none";
+  updateBar();
+  bgVideo.currentTime = 0;
+  bgVideo.play();
+  gameLoop = setInterval(()=>{
+    if(gameOver){ clearInterval(gameLoop); return;}
+    currentHP -= 20;
+    if(currentHP <= 0 && !gameOver){
+      endGame("YOU FAILED, EZREAL DIED AND YOU WON THE GAME");
     }
+    updateBar();
+  }, 30);
+}
 
-    function endGame(message, isWin = false) {
-      gameOver = true;
-      if (isWin) {
-        document.getElementById("winOverlay").style.display = "flex";
-      } else {
-        document.getElementById("result").innerText = message + " | press F/tap to try again";
-      }
-      clearInterval(gameLoop);
-    }
+// Controls
+cancelButton.addEventListener('click', cancelUlt);
 
-    function cancelUlt() {
-      if (gameOver) return;
-      if (Math.floor(currentHP) === 834) {
-        endGame("Welcome Back, Master Caedrel", true);
-      } else if (currentHP < 834 && currentHP > 0) {
-        endGame("YOU ARE NOT CAEDREL, TRAIN MORE");
-      }
-    }
-
-    function startGame() {
-      currentHP = maxHP;
-      gameOver = false;
-      document.getElementById("result").innerText = "";
-      document.getElementById("winOverlay").style.display = "none";
-      updateBar();
-      bgVideo.currentTime = 0;
-      bgVideo.play();
-      gameLoop = setInterval(() => {
-        if (gameOver) { clearInterval(gameLoop); return; }
-        currentHP -= 20;
-        if (currentHP <= 0 && !gameOver) {
-          endGame("YOU FAILED, EZREAL DIED AND YOU WON THE GAME");
-        }
-        updateBar();
-      }, 30);
-    }
-
-    // Desktop and Mobile Controls
-    cancelButton.addEventListener('click', cancelUlt);
-
-    // Tap anywhere to cancel or restart
-    document.body.addEventListener('touchstart', function(e){
-      if(gameOver){
-        startGame();
-      } else {
-        cancelUlt();
-      }
-    });
-
-    // Desktop keyboard controls
-    document.addEventListener("keydown", function(e) {
-      if (e.code === "Space") cancelUlt();
-      if (e.code === "KeyF" && gameOver) startGame();
-    });
-
+// Tap anywhere to cancel or restart
+document.body.addEventListener('touchstart', function(e){
+  if(gameOver){
     startGame();
-  </script>
+  } else {
+    cancelUlt();
+  }
+});
+
+// Desktop keyboard controls
+document.addEventListener("keydown", function(e){
+  if(e.code==="Space") cancelUlt();
+  if(e.code==="KeyF" && gameOver) startGame();
+});
+
+startGame();
+</script>
+
 </body>
 </html>
