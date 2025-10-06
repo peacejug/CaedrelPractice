@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caedrel Practice</title>
   <style>
     body {
@@ -44,7 +46,8 @@
     }
 
     #hpBar {
-      width: 500px;
+      width: 90%;
+      max-width: 500px;
       height: 30px;
       background: rgba(0, 0, 0, 0.5);
       margin: 20px auto;
@@ -59,12 +62,12 @@
     }
 
     button {
-      padding: 10px 20px;
-      font-size: 18px;
+      padding: 25px 40px;
+      font-size: 24px;
       margin-top: 20px;
       cursor: pointer;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       background-color: rgba(255, 255, 255, 0.8);
       color: #333;
     }
@@ -91,6 +94,7 @@
       height: 100%;
       background: rgba(0,0,0,0.9);
       z-index: 10;
+      display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
@@ -129,7 +133,6 @@
       75% { transform: translate(-5px, 0); }
       100% { transform: translate(0, 0); }
     }
-
   </style>
 </head>
 <body>
@@ -140,10 +143,10 @@
 
   <div id="container">
     <h1>Caedrel Practice</h1>
-    <p>Press SPACE or click the button to cancel Malzahar's ult!</p>
+    <p>Tap the button below or anywhere on the screen to cancel Malzahar's ult!</p>
     <div id="hpBar"><div id="hpFill"></div></div>
     <p id="hpText">Ezreal HP: 834</p>
-    <button onclick="cancelUlt()">Cancel Ult!</button>
+    <button id="cancelButton">Cancel Ult!</button>
     <div id="result"></div>
   </div>
 
@@ -151,7 +154,7 @@
   <div id="winOverlay">
     <h1>WELCOME BACK, MASTER CAEDREL</h1>
     <img src="https://i.imgur.com/Dbhe4vG.jpeg" alt="Caedrel Face" />
-    <p style="color:white; font-size:22px;">Press F to restart</p>
+    <p style="color:white; font-size:22px;">Press Restart button or tap to restart</p>
   </div>
 
   <script>
@@ -160,6 +163,7 @@
     let gameOver = false;
     let gameLoop;
     let bgVideo = document.getElementById("bgVideo");
+    let cancelButton = document.getElementById("cancelButton");
 
     function updateBar() {
       let percent = (currentHP / maxHP) * 100;
@@ -172,7 +176,7 @@
       if (isWin) {
         document.getElementById("winOverlay").style.display = "flex";
       } else {
-        document.getElementById("result").innerText = message + " | Press F to restart";
+        document.getElementById("result").innerText = message + " | Tap the button or screen to restart";
       }
       clearInterval(gameLoop);
     }
@@ -192,11 +196,11 @@
       document.getElementById("result").innerText = "";
       document.getElementById("winOverlay").style.display = "none";
       updateBar();
-      bgVideo.currentTime = 0; // restart video
+      bgVideo.currentTime = 0;
       bgVideo.play();
       gameLoop = setInterval(() => {
         if (gameOver) { clearInterval(gameLoop); return; }
-        currentHP -= 20;  // very fast ticking
+        currentHP -= 20;
         if (currentHP <= 0 && !gameOver) {
           endGame("YOU FAILED, EZREAL DIED AND YOU WON THE GAME");
         }
@@ -204,6 +208,19 @@
       }, 30);
     }
 
+    // Desktop and Mobile Controls
+    cancelButton.addEventListener('click', cancelUlt);
+
+    // Tap anywhere to cancel or restart
+    document.body.addEventListener('touchstart', function(e){
+      if(gameOver){
+        startGame();
+      } else {
+        cancelUlt();
+      }
+    });
+
+    // Desktop keyboard controls
     document.addEventListener("keydown", function(e) {
       if (e.code === "Space") cancelUlt();
       if (e.code === "KeyF" && gameOver) startGame();
