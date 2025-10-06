@@ -193,6 +193,7 @@ let gameLoop;
 let cancelButton = document.getElementById("cancelButton");
 let restartButton = document.getElementById("restartButton");
 let animationLock = false;
+let lossSound = null;
 
 function updateBar() {
   let percent = (currentHP / maxHP) * 100;
@@ -217,7 +218,11 @@ function endGame(message, isWin=false) {
     winSound.play();
     document.getElementById("winOverlay").style.display = "flex";
   } else {
-    const lossSound = new Audio('https://peacejug.github.io/CaedrelPractice/loss.mp3');
+    if(lossSound){
+      lossSound.pause();
+      lossSound.currentTime = 0;
+    }
+    lossSound = new Audio('https://peacejug.github.io/CaedrelPractice/loss.mp3');
     lossSound.volume = 0.7;
     lossSound.play();
 
@@ -238,6 +243,10 @@ function cancelUlt(){
 }
 
 function startGame(){
+  if(lossSound){
+    lossSound.pause();
+    lossSound.currentTime = 0;
+  }
   currentHP = maxHP;
   gameOver = false;
   animationLock = false;
