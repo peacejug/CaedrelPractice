@@ -162,7 +162,6 @@ function isMobile() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
-// Mobile video fallback
 window.addEventListener('DOMContentLoaded', () => {
   if(isMobile()){
     const video = document.getElementById('bgVideo');
@@ -218,8 +217,13 @@ function endGame(message, isWin=false) {
     winSound.play();
     document.getElementById("winOverlay").style.display = "flex";
   } else {
+    const lossSound = new Audio('https://peacejug.github.io/CaedrelPractice/loss.mp3');
+    lossSound.volume = 0.7;
+    lossSound.play();
+
     document.getElementById("result").innerText = message + " | press F/tap to try again";
   }
+
   clearInterval(gameLoop);
 }
 
@@ -254,11 +258,7 @@ function startGame(){
 
 // Controls
 cancelButton.addEventListener('click', () => {
-  if(gameOver){
-    startGame(); // restart on PC click if game over
-  } else {
-    cancelUlt();
-  }
+  if(gameOver){ startGame(); } else { cancelUlt(); }
 });
 restartButton.addEventListener('click', startGame);
 
