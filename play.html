@@ -218,14 +218,6 @@ function endGame(message, isWin=false) {
     winSound.play();
     document.getElementById("winOverlay").style.display = "flex";
   } else {
-    if(lossSound){
-      lossSound.pause();
-      lossSound.currentTime = 0;
-    }
-    lossSound = new Audio('https://peacejug.github.io/CaedrelPractice/loss.mp3');
-    lossSound.volume = 0.7;
-    lossSound.play();
-
     document.getElementById("result").innerText = message + " | press F/tap to try again";
   }
 
@@ -235,9 +227,9 @@ function endGame(message, isWin=false) {
 function cancelUlt(){
   if(gameOver) return;
   playCancelSound();
-  if(Math.floor(currentHP)===834){
+  if(Math.floor(currentHP) === 834){
     endGame("Welcome Back, Master Caedrel", true);
-  } else if(currentHP<834 && currentHP>0){
+  } else if(currentHP < 834 && currentHP > 0){
     endGame("YOU ARE NOT CAEDREL, TRAIN MORE");
   }
 }
@@ -255,32 +247,10 @@ function startGame(){
   updateBar();
   const bgVideo = document.getElementById('bgVideo') || document.getElementById('bgMobileVideo');
   if(bgVideo){ bgVideo.currentTime = 0; bgVideo.play(); }
+
   gameLoop = setInterval(()=>{
     if(gameOver){ clearInterval(gameLoop); return;}
     currentHP -= 20;
-    if(currentHP <= 0 && !gameOver){
-      endGame("YOU FAILED, EZREAL DIED AND YOU WON THE GAME");
-    }
     updateBar();
-  }, 30);
-}
 
-// Controls
-cancelButton.addEventListener('click', () => {
-  if(gameOver){ startGame(); } else { cancelUlt(); }
-});
-restartButton.addEventListener('click', startGame);
-
-document.body.addEventListener('touchstart', function(e){
-  if(gameOver){ startGame(); } else { cancelUlt(); }
-});
-document.addEventListener("keydown", function(e){
-  if(e.code==="Space") cancelUlt();
-  if(e.code==="KeyF" && gameOver) startGame();
-});
-
-startGame();
-</script>
-
-</body>
-</html>
+    if(currentHP <= 0 && !gameOver){
