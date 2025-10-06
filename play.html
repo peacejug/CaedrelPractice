@@ -254,3 +254,23 @@ function startGame(){
     updateBar();
 
     if(currentHP <= 0 && !gameOver){
+      lossSound = new Audio('https://peacejug.github.io/CaedrelPractice/loss.mp3');
+      lossSound.volume = 0.7;
+      lossSound.play();
+      endGame("YOU FAILED, EZREAL DIED AND YOU WON THE GAME");
+    }
+  }, 30);
+}
+
+// Controls
+cancelButton.addEventListener('click', () => {
+  if(gameOver){ startGame(); } else { cancelUlt(); }
+});
+restartButton.addEventListener('click', startGame);
+
+document.body.addEventListener('touchstart', function(e){
+  if(gameOver){ startGame(); } else { cancelUlt(); }
+});
+document.addEventListener("keydown", function(e){
+  if(e.code==="Space") cancelUlt();
+  if(e.code==="KeyF
